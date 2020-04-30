@@ -107,9 +107,9 @@ log_version_info
 clean_up
 install_console_tokens
 install_adb_keys
-install_grpc_certs
-setup_pulse_audio
-forward_loggers
+#install_grpc_certs
+#setup_pulse_audio
+#forward_loggers
 
 # Override config settings that the user forcefully wants to override.
 if [ ! -z "${AVD_CONFIG}" ]; then
@@ -122,15 +122,16 @@ fi
 /android/sdk/platform-tools/adb start-server
 
 # All our ports are loopback devices, so setup a simple forwarder
-socat -d tcp-listen:5555,reuseaddr,fork tcp:127.0.0.1:5557 &
+#socat -d tcp-listen:5555,reuseaddr,fork tcp:127.0.0.1:5557 &
 
 # Kick off the emulator
-exec emulator/emulator @Pixel2 -no-audio -verbose -wipe-data \
+exec emulator/emulator @Pixel2 -no-audio -wipe-data \
   -ports 5556,5557 \
-  -grpc 8554 -no-window -skip-adb-auth \
+  #-grpc 8554 \ 
+  -no-window -skip-adb-auth \
   -no-snapshot \
-  -shell-serial file:/tmp/android-unknown/kernel.log \
-  -logcat-output /tmp/android-unknown/logcat.log \
+  #-shell-serial file:/tmp/android-unknown/kernel.log \
+  #-logcat-output /tmp/android-unknown/logcat.log \
   -feature  AllowSnapshotMigration \
   -gpu swiftshader_indirect \
   {{extra}} ${EMULATOR_PARAMS} -qemu -append panic=1
