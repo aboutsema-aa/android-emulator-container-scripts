@@ -16,7 +16,7 @@
 
 log_version_info() {
   # This function logs version info.
-  emulator/emulator -version | head -n 1 | sed -u 's/^/version: /g'
+  $ANDROID_HOME/emulator/emulator -version | head -n 1 | sed -u 's/^/version: /g'
   echo 'version: launch_script: {{version}}'
   img=$ANDROID_SDK_ROOT/system-images/android
   [ -f "$img/x86_64/source.properties" ] && cat "$img/x86_64/source.properties" | sed -u 's/^/version: /g'
@@ -119,13 +119,13 @@ fi
 
 # Launch internal adb server, needed for our health check.
 # Once we have the grpc status point we can use that instead.
-/android/sdk/platform-tools/adb start-server
+$ANDROID_HOME/platform-tools/adb start-server
 
 # All our ports are loopback devices, so setup a simple forwarder
 #socat -d tcp-listen:5555,reuseaddr,fork tcp:127.0.0.1:5557 &
 
 # Kick off the emulator
-exec emulator/emulator @Pixel2 -no-audio -wipe-data \
+exec $ANDROID_HOME/emulator/emulator @Pixel2 -no-audio -wipe-data \
   -ports 5556,5557 \
   #-grpc 8554 \ 
   -no-window -skip-adb-auth \
