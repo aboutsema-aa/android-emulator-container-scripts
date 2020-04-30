@@ -13,6 +13,7 @@
 # limitations under the License.
 {{from_base_img}}
 
+
 # Prevent error while installing OpenJDK8 on debian-stretch-slim
 RUN mkdir -p /usr/share/man/man1
 
@@ -41,13 +42,26 @@ RUN mkdir -p /android/sdk/platforms && \
 # as this will improve caching.
 COPY launch-emulator.sh /android/sdk/
 COPY platform-tools/adb /android/sdk/platform-tools/adb
-COPY default.pa
+COPY default.pa /etc/pulse/default.pa
 
-RUN chmod +x /android/sdk/launch-emulator.sh /android/sdk/platform-tools/adb
+RUN gpasswd -a root audio && \
+    chmod +x /android/sdk/launch-emulator.sh /android/sdk/platform-tools/adb
 
 COPY avd/ /android-home
 COPY emu/ /android/sdk/
 COPY sys/ /android/sdk/system-images/android/
+# Create an initial snapshot so we will boot fast next time around,
+# This is currently an experimental feature, and is not easily configurable//
+# RUN --security=insecure cd /android/sdk && ./launch-emulator.sh -quit-after-boot 120
+
+# This is the console port, you usually want to keep this closed.
+EXPOSE 5554
+
+# This is the ADB port, useful.
+EXPOSE 5555
+
+# This is the gRPC port, also useful, we don't want ADB to incorrectly identify this.
+EXPOSE 8554
 
 ENV ANDROID_SDK_ROOT /android/sdk
 ENV ANDROID_AVD_HOME /android-home
